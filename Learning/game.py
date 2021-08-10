@@ -1,3 +1,4 @@
+import typing
 
 class Game:
 
@@ -21,7 +22,7 @@ class Game:
     def is_crosses_won(self) -> bool:
         pass
 
-    def get_steps(self) -> list:   # generator function
+    def get_steps(self) -> typing.Generator[list]:   # generator function
         while False:
             yield None
         raise StopIteration()

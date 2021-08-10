@@ -7,7 +7,7 @@ class Learning:
         self.players = [None for _ in range(players)]  # list of players those are model_class typed
         self.epochs = epochs
 
-    def learn(self, epochs: int):
+    def learn(self):
         pass
 
     def epoch(self):
