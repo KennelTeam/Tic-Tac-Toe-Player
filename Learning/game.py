@@ -41,7 +41,7 @@ class Game:
     def get_winner(self) -> PlayerRole:
         return self.winner
 
-    def get_steps(self) -> typing.Tuple[typing.Generator[np.ndarray], int]:   # generator function
+    def get_steps(self) -> typing.Generator[typing.Tuple[np.ndarray, typing.Tuple[int, int]], None, None]:   # generator function
         field_tmp = np.zeros(shape=(self.FIELD_SIZE, self.FIELD_SIZE), dtype=np.int)
         for step in self.steps_list:
             field_tmp[step[0]][step[1]] = 1
