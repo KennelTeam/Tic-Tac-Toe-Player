@@ -1,16 +1,17 @@
 from typing import *
 from utils.player_role import PlayerRole
+import numpy as np
 
 
 # true if step is correct
-def validate_step(field: List[List[int]], step: Tuple[int, int]) -> bool:
-    if 0 <= step[0] < len(field) and 0 <= step[1] < len(field[0]):
+def validate_step(field: np.ndarray, step: Tuple[int, int]) -> bool:
+    if 0 <= step[0] < field.shape[0] and 0 <= step[1] < field.shape[1]:
         return False
     return field[step[0]][step[1]] == 0
 
 
 # true if tie
-def check_tie(field: List[List[int]]) -> bool:
+def check_tie(field: np.ndarray) -> bool:
     for line in field:
         for point in line:
             if point == 0:
@@ -18,12 +19,11 @@ def check_tie(field: List[List[int]]) -> bool:
     return False
 
 
-def revert_field(field: List[List[int]]) -> List[List[int]]:
-    pass
+def revert_field(field: np.ndarray) -> np.ndarray:
+    return field * -1
 
 
-
-def check_game_result(field: List[List[int]], last_step: Tuple[int, int], last_player: PlayerRole) -> PlayerRole:
+def check_game_result(field: np.ndarray, last_step: Tuple[int, int], last_player: PlayerRole) -> PlayerRole:
     for dx in [-1, 0, 1]:
         for dy in [0, 1]:
             if dx == 0 and dy == 0:
@@ -31,8 +31,8 @@ def check_game_result(field: List[List[int]], last_step: Tuple[int, int], last_p
 
             coefficient_start = min(min(4, last_step[0] / dx if dx != 0 else 4),
                                     min(4, last_step[1] / dy if dy != 0 else 4))
-            coefficient_end = min(min(4, ((len(field) - last_step[0]) / dx) if dx != 0 else 4),
-                                  min(4, ((len(field) - last_step[1]) / dy) if dy != 0 else 4))
+            coefficient_end = min(min(4, ((field.shape[0] - last_step[0]) / dx) if dx != 0 else 4),
+                                  min(4, ((field.shape[1] - last_step[1]) / dy) if dy != 0 else 4))
 
             max_in_row = 0
             row = 0
