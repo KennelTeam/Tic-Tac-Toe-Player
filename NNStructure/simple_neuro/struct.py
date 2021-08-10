@@ -1,14 +1,17 @@
 from typing import Tuple
 
+import torch
 from torch import nn
 
 
-class Neuro1Struct(nn.Module):
+class SimpleNeuroStruct(nn.Module):
     def __init__(self):
         super().__init__()
-        self.layers = []
+        self.layers = [
+            nn.Linear(225, 225)
+        ]
 
-    def forward(self, data: Tuple[float]):
+    def forward(self, data: torch.Tensor) -> torch.Tensor:
         for layer in self.layers:
             data = layer(data)
         return data
