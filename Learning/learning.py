@@ -1,6 +1,7 @@
 from NNStructure.base_facade import BaseFacade
 from Learning.game import Game
 from utils.player_role import PlayerRole
+import random
 
 
 class Learning:
@@ -12,6 +13,7 @@ class Learning:
     def learn(self):
         for ep in range(self.epochs):
             self.epoch()
+            random.shuffle(self.players)
 
     def epoch(self):
         for idx, first_player in enumerate(self.players):
