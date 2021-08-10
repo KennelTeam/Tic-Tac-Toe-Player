@@ -38,7 +38,3 @@ class GameWindow:
 
     def on_game_started(self):
         pass
-
-    # true if move is correct
-    def validate_move(self, move: Tuple[int, int]) -> bool:
-        pass
