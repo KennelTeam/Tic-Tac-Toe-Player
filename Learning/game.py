@@ -1,4 +1,6 @@
+from utils.player_role import PlayerRole
 import typing
+
 
 class Game:
 
@@ -9,18 +11,19 @@ class Game:
         self.end = False
         self.field = [[0] * self.FIELD_SIZE for _ in range(self.FIELD_SIZE)]
         self.crosses_turn = True
+        self.winner = PlayerRole.NONE
 
-    def step(self, x_step: int , y_step: int):
+    def step(self, x_step: int, y_step: int):
         pass
 
     def end_game(self) -> bool:
-        pass
+        return self.end
 
     def is_drawn(self) -> bool:
-        pass
+        return self.end and self.winner == PlayerRole.NONE
 
-    def is_crosses_won(self) -> bool:
-        pass
+    def winner(self) -> PlayerRole:
+        return self.winner
 
     def get_steps(self) -> typing.Generator[list]:   # generator function
         while False:

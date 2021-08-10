@@ -1,6 +1,7 @@
 from NNStructure.base_facade import BaseFacade
 from Learning.game import Game
 
+
 class Learning:
     def __init__(self, model_class: type, players: int, epochs: int, **kwargs):
         self.model_class = model_class
@@ -19,5 +20,5 @@ class Learning:
     def save_players_state(self):
         pass
 
-    def show_statistics(self, **kwargs):
+    def save_statistics(self, **kwargs):
         pass
