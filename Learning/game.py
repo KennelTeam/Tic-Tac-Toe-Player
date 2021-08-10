@@ -6,7 +6,7 @@ import numpy as np
 
 class Game:
 
-    FIELD_SIZE = 15
+    FIELD_SIZE = 5
 
     def __init__(self):
         # list of tuples (x_step, y_step)
@@ -21,8 +21,10 @@ class Game:
             raise RuntimeError("Attempt to make step after game is finished")
         if validate_step(self.field, xy_step):
             self.steps_list.append(xy_step)
-            self.field[xy_step[0]][xy_step[1]] = 1
+
             self.winner = check_game_result(self.field, xy_step, self.turn)
+            self.field[xy_step[0]][xy_step[1]] = 1
+            print(f"winner: {self.winner}")
 
             if self.winner != PlayerRole.NONE:
                 self.end = True

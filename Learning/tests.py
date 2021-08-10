@@ -13,7 +13,7 @@ class TestFacade(BaseFacade):
     def make_move(self, field: np.ndarray):
         for x in range(len(field)):
             for y in range(len(field)):
-                if field.sum == 0:
+                if field.sum() == 0:
                     if field[x, y] == 0:
                         print(">>", x, y)
                         return x, y
@@ -28,7 +28,7 @@ class TestFacade(BaseFacade):
     def learn(self, game_history: Game, your_role: PlayerRole):
         print("Learn!!")
         print("PlayerRole:", "CROSSES" if your_role == PlayerRole.CROSSES else "NOUGHTS")
-        if game_history.winner() == your_role:
+        if game_history.get_winner() == your_role:
             print("I won!")
         elif game_history.is_tie():
             print("Tie :|")
