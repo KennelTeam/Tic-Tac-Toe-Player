@@ -1,16 +1,11 @@
 import tkinter
 from Visual import player
 from typing import *
-
+from utils.player_role import PlayerRole
 
 # map player names to paths to config files
 def find_players() -> Dict[str, str]:
     pass
-
-
-class PlayerType:
-    CROSSES = 0
-    NOUGHTS = 1
 
 
 class GameWindow:
@@ -19,7 +14,7 @@ class GameWindow:
     __noughts_player: player.BasePlayer
     # map name of player (which will be rendered) to path to config file
     __player_options: Dict[str, str]
-    __current_player: PlayerType
+    __current_player: PlayerRole
 
     __tkinter_window: tkinter.Tk
 
