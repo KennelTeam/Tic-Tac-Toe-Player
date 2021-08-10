@@ -6,8 +6,8 @@ import numpy as np
 # true if step is correct
 def validate_step(field: np.ndarray, step: Tuple[int, int]) -> bool:
     if 0 <= step[0] < field.shape[0] and 0 <= step[1] < field.shape[1]:
-        return False
-    return field[step[0]][step[1]] == 0
+        return field[step[0]][step[1]] == 0
+    return False
 
 
 # true if tie
