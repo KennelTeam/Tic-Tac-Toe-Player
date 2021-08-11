@@ -28,7 +28,7 @@ class SimpleNeuroFacade(BaseFacade):
         self.cdir = './Models/' + name + '/'
         if name in exneuros:
             config = self.load_config()
-            if config['facade_name'] == self.__class__.__name__ :
+            if config['facade_name'] == self.__class__.__name__:
                 if load_state:
                     if 'actual_state' in config.keys():
                         statePath = self.cdir + 'checkpoints/' + config['actual_state']
