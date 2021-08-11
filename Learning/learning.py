@@ -1,6 +1,7 @@
 from NNStructure.base_facade import BaseFacade
 from Learning.game import Game
 from utils.player_role import PlayerRole
+from utils.gameplay import play
 import random
 from datetime import datetime
 
@@ -32,13 +33,8 @@ class Learning:
                 self.play(first_player, second_player)
                 self.play(second_player, first_player)
 
-    def play(self, crosses_player: BaseFacade, noughts_player: BaseFacade):
-        game = Game()
-        while not game.end_game():
-            if game.turn == PlayerRole.CROSSES:
-                move = crosses_player.make_move(game.field)
-            else:
-                move = noughts_player.make_move(- game.field)
-            game.step(move)
+    def play(self, crosses_player: BaseFacade, noughts_player: BaseFacade) -> Game:
+        game = play(crosses_player, noughts_player)
         crosses_player.learn(game, PlayerRole.CROSSES)
         noughts_player.learn(game, PlayerRole.NOUGHTS)
+        return game
