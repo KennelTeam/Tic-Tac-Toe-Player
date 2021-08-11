@@ -10,6 +10,9 @@ import threading
 
 
 class Learning:
+
+    K_CHECKPOINTS = 10
+
     def __init__(self, model_class: Type[BaseFacade], players: int, epochs: int, dir_names=[]):
         self.model_class = model_class
         if len(dir_names) > players:
@@ -31,9 +34,13 @@ class Learning:
         self.epochs = epochs
 
     def learn(self) -> Generator[PlayerRole, None, None]:
+        chp_number = 1
         for ep in range(self.epochs):
             for winner in self.epoch_async():
                 yield winner
+            if ep / self.epochs >= 1 / self.K_CHECKPOINTS * chp_number:
+                for player in self.players:
+                    player.create_checkpoint(chp_number)
             random.shuffle(self.players)
 
     def epoch_async(self) -> Generator[PlayerRole, None, None]:
@@ -49,7 +56,7 @@ class Learning:
             thread.join()
             yield PlayerRole.NONE
 
-    def epoch(self) -> Generator[PlayerRole, None, None]:
+    def epoch(self) -> Statistics.stats.StatsCompressed:
         for first_player in self.players:
             for second_player in self.players:
                 # print(first_player.cdir, second_player.cdir)
