@@ -15,6 +15,6 @@ for name in players:
     for class_name, obj in inspect.getmembers(facade):
         if inspect.isclass(obj) and inspect.getmodule(obj) == facade:
             if issubclass(obj, base_facade.BaseFacade):
-                NN_FACADES[name] = obj
+                NN_FACADES[obj.__name__] = obj
 
 INITIALIZED = True

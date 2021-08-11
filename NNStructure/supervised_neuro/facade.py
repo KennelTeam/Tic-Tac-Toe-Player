@@ -9,20 +9,20 @@ from torch import nn
 import pandas as pd
 from Learning.game import Game
 from NNStructure.base_facade import BaseFacade
-from NNStructure.simple_neuro.struct import SimpleNeuroStruct
+from NNStructure.supervised_neuro.struct import SupervisedNeuroStructure
 from utils.config import DEVICE_NAME
 from utils.player_role import PlayerRole
 
 
-class SimpleNeuroFacade(BaseFacade):
+class SupervisedNeuroFacade(BaseFacade):
     loss_function: nn.BCELoss
     cdir: str
-    net: SimpleNeuroStruct
+    net: SupervisedNeuroStructure
     statsTable: pd.DataFrame
 
     def __init__(self, name: str, load_state=True, lr: float = 10.0, version: int = -1):
         super().__init__(name)
-        self.net = SimpleNeuroStruct()
+        self.net = SupervisedNeuroStructure()
 
         self.loss_function = nn.BCELoss()
         self.lr = lr
@@ -108,45 +108,30 @@ class SimpleNeuroFacade(BaseFacade):
         return result
 
     def learn(self, game_history: Game, myrole: PlayerRole):
-        isMyTurn = myrole == PlayerRole.CROSSES
-        iWin = game_history.get_winner() == myrole
-        if iWin:
-            iters = 1
-            loss = 0
-            corr_anses = 0
-            for field, inp_ans in game_history.get_steps():
-                if isMyTurn:
-                    # field = self.prepare_field(field)
-                    for i in range(15):
-                        for j in range(15):
-                            # fc = field.copy()
-                            if field[0][i * 15 + j] == 0:
-                                field[0][i * 15 + j] = 1
-                                nloss = 0
-                                iscnas = 0
-                                if i == inp_ans[0] and j == inp_ans[1]:
-                                    self.one_learning_step(field, True)
-                                    nloss, iscans = self.one_learning_step(field, True)
-                                else:
-                                    self.one_learning_step(field, False)
-                                field[0][i * 15 + j] = 0
-                                nloss, iscans = self.one_learning_step(field, False)
-                                loss = (loss * iters + nloss) / (iters + 1)
-                                corr_anses = (corr_anses * iters + iscnas) / (iters + 1)
-                                iters += 1
-                isMyTurn = not isMyTurn
-            self.statsTable = self.statsTable.append({
-                'role': myrole,
-                'turns_in_game': len(game_history.steps_list),
-                'result': corr_anses,
-                'MSE': loss.item()
-            }, ignore_index=True)
-            # print()
-            # print(self.statsTable)
-            self.statsTable.to_csv(self.cdir + 'stats.csv')
+        iters = 1
+        loss = 0
+        corr_anses = 0
+        for field, inp_ans in game_history.get_steps():
+            # field = self.prepare_field(field)
+            for i in range(15):
+                for j in range(15):
+                    # fc = field.copy()
+                    if field[0][i * 15 + j] == 0:
+                        field[0][i * 15 + j] = 1
+                        nloss = 0
+                        iscnas = 0
+                        if i == inp_ans[0] and j == inp_ans[1]:
+                            self.one_learning_step(field, True)
+                            nloss, iscans = self.one_learning_step(field, True)
+                        else:
+                            self.one_learning_step(field, False)
+                        field[0][i * 15 + j] = 0
+                        nloss, iscans = self.one_learning_step(field, False)
+                        loss = (loss * iters + nloss) / (iters + 1)
+                        corr_anses = (corr_anses * iters + iscnas) / (iters + 1)
+                        iters += 1
 
     def one_learning_step(self, field: torch.Tensor, isgood: bool) -> (float, float):
-
         optimizer = torch.optim.Adam(self.net.parameters(), lr=self.lr)
         optimizer.zero_grad()
         # field = self.prepare_field(field)

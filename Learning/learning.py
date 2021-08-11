@@ -6,6 +6,7 @@ import random
 from datetime import datetime
 from typing import *
 import Statistics.stats
+import threading
 
 
 class Learning:
@@ -32,22 +33,35 @@ class Learning:
         # self.players = [model_class(dir_name) for dir_name in dir_names + new_names]
         self.epochs = epochs
 
-    def learn(self) -> Generator[Statistics.stats.StatsCompressed, None, None]:
+    def learn(self) -> Generator[PlayerRole, None, None]:
         chp_number = 1
         for ep in range(self.epochs):
-            epoch_stats = self.epoch()
-            random.shuffle(self.players)
+            for winner in self.epoch():
+                yield winner
             if ep / self.epochs >= 1 / self.K_CHECKPOINTS * chp_number:
                 for player in self.players:
                     player.create_checkpoint(chp_number)
-            yield epoch_stats
+            random.shuffle(self.players)
 
-    def epoch(self) -> Statistics.stats.StatsCompressed:
-        for idx, first_player in enumerate(self.players):
-            for second_player in self.players[idx:]:
-                self.play(first_player, second_player)
-                self.play(second_player, first_player)
-        return Statistics.stats.StatsCompressed()
+    def epoch_async(self) -> Generator[PlayerRole, None, None]:
+        threads = []
+        for i in range(0, len(self.players), 2):
+            first_player = self.players[i]
+            second_player = self.players[min(i + 1, len(self.players) - 1)]
+            thread = threading.Thread(target=Learning.play, args=(self, first_player, second_player))
+            thread.start()
+            threads.append(thread)
+
+        for thread in threads:
+            thread.join()
+            yield PlayerRole.NONE
+
+    def epoch(self) -> Generator[PlayerRole, None, None]:
+        for first_player in self.players:
+            for second_player in self.players:
+                # print(first_player.cdir, second_player.cdir)
+                game = self.play(first_player, second_player)
+                yield game.get_winner()
 
     def play(self, crosses_player: BaseFacade, noughts_player: BaseFacade) -> Game:
         game = play(crosses_player, noughts_player)

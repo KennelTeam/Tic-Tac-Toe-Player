@@ -58,6 +58,7 @@ if __name__ == '__main__':
     init()
     cuda.init()
     torch.cuda.set_device(0)
+    torch.backends.cudnn.benchmark = True
     print("initialized")
 
     # t = torch.Tensor(np.ndarray(shape=(10000, 10000))).to(torch.device("cuda"))
@@ -90,12 +91,13 @@ if __name__ == '__main__':
                                                       epochs=args.e,
                                                       dir_names=dir_names)
 
-                epoch_id = 0
-                print_progress_bar(epoch_id, args.e, prefix="Learning...", suffix=" done", length=50)
+                total_games = args.e * args.p ** 2
+                game_id = 0
+                print_progress_bar(game_id, total_games, prefix="Learning...", suffix=" done", length=50)
                 for stats in learning.learn():
-                    epoch_id += 1
-                    suffix = stats.to_string()
-                    print_progress_bar(epoch_id, args.e, prefix="Learning...", suffix=(" done\n" + suffix), length=50)
+                    game_id += 1
+                    suffix = f"Won {str(stats)}"
+                    print_progress_bar(game_id, total_games, prefix="Learning...", suffix=(" done: " + suffix), length=50)
                 success("Done!")
             except Exception as e:
                 error(e)

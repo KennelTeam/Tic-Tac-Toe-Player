@@ -21,19 +21,21 @@ def find_facades() -> List[str]:
 def find_players() -> Dict[str, str]:
     result = {}
     for folder in os.listdir("Models"):
-        if os.path.isdir(folder):
+        if os.path.isdir("Models/" + folder):
+
             try:
                 config = open(os.path.join(os.path.join("Models", folder), "config.json"), 'r')
                 data = ''.join(config.readlines())
+                print(data)
                 config.close()
                 data = json.loads(data)
                 name = data['name']
                 if not name:
                     continue
 
-                result[name] = os.path.join("Models", folder)
+                result[name] = folder
             except:
                 continue
-        return result
+    return result
 
 

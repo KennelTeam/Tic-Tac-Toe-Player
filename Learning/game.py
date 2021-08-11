@@ -14,8 +14,7 @@ class Game:
         # list of tuples (x_step, y_step)
         self.steps_list: typing.List[typing.Tuple[int, int]] = list()
         self.end = False
-        self.field = torch.Tensor(np.zeros(shape=(1, self.FIELD_SIZE ** 2), dtype=np.int))
-        self.field = self.field.to(torch.device(DEVICE_NAME))
+        self.field = torch.zeros([1, self.FIELD_SIZE ** 2], device=torch.device(DEVICE_NAME))
         self.turn = PlayerRole.CROSSES
         self.winner = PlayerRole.NONE
 
@@ -53,8 +52,7 @@ class Game:
 
     # generator function
     def get_steps(self) -> typing.Generator[typing.Tuple[torch.Tensor, typing.Tuple[int, int]], None, None]:
-        field_tmp = torch.Tensor(np.zeros(shape=(1, self.FIELD_SIZE ** 2), dtype=np.int))
-        field_tmp = field_tmp.to(torch.device(DEVICE_NAME))
+        field_tmp = torch.zeros([1, self.FIELD_SIZE ** 2], device=torch.device(DEVICE_NAME))
 
         for step in self.steps_list:
             yield field_tmp, step
