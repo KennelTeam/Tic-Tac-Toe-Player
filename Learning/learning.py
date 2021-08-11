@@ -40,7 +40,8 @@ class Learning:
                 yield winner
             if ep / self.epochs >= 1 / self.K_CHECKPOINTS * chp_number:
                 for player in self.players:
-                    player.create_checkpoint(chp_number)
+                    player.create_checkpoint(ep + 1)
+                chp_number += 1
             random.shuffle(self.players)
 
     def epoch_async(self) -> Generator[PlayerRole, None, None]:
