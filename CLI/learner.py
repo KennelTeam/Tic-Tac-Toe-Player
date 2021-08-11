@@ -3,7 +3,7 @@ import sys
 
 import torch
 import pycuda.driver as cuda
-
+import numpy as np
 main_path = os.path.join(sys.path[0], '..')
 sys.path.insert(0, os.path.abspath(main_path))
 
@@ -58,6 +58,9 @@ if __name__ == '__main__':
     init()
     cuda.init()
     torch.cuda.set_device(0)
+    print("initialized")
+
+    # t = torch.Tensor(np.ndarray(shape=(10000, 10000))).to(torch.device("cuda"))
 
     parser = argparse.ArgumentParser(description="Run learning process")
     parser.add_argument("-e", type=int, help="Number of epochs")
