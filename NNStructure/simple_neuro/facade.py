@@ -1,7 +1,9 @@
-from typing import Tuple
+import json
+import shutil
 
 import numpy as np
 import torch
+import os
 from torch import nn
 
 from Learning.game import Game
@@ -12,19 +14,60 @@ from utils.player_role import PlayerRole
 
 class SimpleNeuroFacade(BaseFacade):
     loss_function: nn.BCELoss
-    optimizer: torch.optim.Adam
+    cdir: str
+    net: SimpleNeuroStruct
 
-    def __init__(self, lr: float, path: str):
-        super().__init__(path)
+    def __init__(self, name: str, loadState = True, lr: float = 0.3):
+        super().__init__()
         self.net = SimpleNeuroStruct()
         self.loss_function = nn.BCELoss()
         self.lr = lr
+
+        exneuros = os.listdir('./Models')
+        self.cdir = './Models/' + name + '/'
+        if name in exneuros:
+            config = self.load_config()
+            if config['facade_name'] == self.__class__.__name__ :
+                if loadState:
+                    if 'actual_state' in config.keys():
+                        statePath = self.cdir + 'checkpoints/' + config['actual_state']
+                        self.net = torch.load(statePath)
+                        self.net.eval()
+            else:
+                raise RuntimeError('Facade in neuro config is different')
+        else:
+            os.mkdir('./Models/' + name)
+            os.mkdir('./Models/' + name + '/checkpoints')
+            shutil.copy('./Models/stats_template.csv', self.cdir + '/stats.csv')
+            config = {'name': name, 'facade_name': self.__class__.__name__}
+            self.save_config(config)
 
     def net_learn(self):
         self.net.train()
 
     def net_play(self):
         self.net.eval()
+
+    def load_config(self) -> dict:
+        configFile = open(self.cdir + 'config.json')
+        config = json.loads(configFile.read())
+        configFile.close()
+        return config
+
+    def save_config(self, config: dict):
+        configFile = open(self.cdir + 'config.json', 'w')
+        configFile.write(json.dumps(config))
+        configFile.close()
+
+    def update_config(self, field: str, val):
+        config = self.load_config()
+        config[field] = val
+        self.save_config(config)
+
+    def create_checkpoint(self, index: int):
+        fname = 'chp' + str(index) + '.pth.tar'
+        torch.save(self.net, self.cdir + 'checkpoints/' + fname)
+        self.update_config('actual_state', fname)
 
     def make_move(self, field: np.ndarray) -> (int, int):
         best = ((-1, -1), -10)

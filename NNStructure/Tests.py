@@ -68,4 +68,20 @@ class Tests(unittest.TestCase):
             moves.add(move)
         print(moves)
 
+    def test_init_facade(self):
+        os.chdir('../')
+        facade = SimpleNeuroFacade(lr=0.3, name='neuroX4')
 
+    def test_update_config(self):
+        os.chdir('../')
+        facade = SimpleNeuroFacade(name='neuroX4', loadState=False)
+        facade.update_config('actual_state', 'x2.pt')
+
+    def test_create_checkpoint(self):
+        os.chdir('../')
+        facade = SimpleNeuroFacade(name='neuroX9', loadState=False)
+        facade.create_checkpoint(1)
+        facade2 = SimpleNeuroFacade(name='neuroX9')
+        facade3 = SimpleNeuroFacade(name='neuroX10')
+        self.assertTrue(torch.equal(facade.net.layers[0].weight, facade2.net.layers[0].weight))
+        self.assertFalse(torch.equal(facade.net.layers[0].weight, facade3.net.layers[0].weight))
