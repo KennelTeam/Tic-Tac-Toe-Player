@@ -4,10 +4,12 @@ from utils.player_role import PlayerRole
 from utils.gameplay import play
 import random
 from datetime import datetime
+from typing import *
+import Statistics.stats
 
 
 class Learning:
-    def __init__(self, model_class: type, players: int, epochs: int, dir_names=[]):
+    def __init__(self, model_class: Type[BaseFacade], players: int, epochs: int, dir_names=[]):
         self.model_class = model_class
         if len(dir_names) > players:
             raise RuntimeError("Too many directory names")
@@ -16,22 +18,29 @@ class Learning:
         new_names = []
         for unnamed_counter in range(players - len(dir_names)):
             name = 'unnamed_' + \
-                   str(datetime.now().strftime('%d.%m.%Y_%H:%M:%S_')) + str(unnamed_counter + 1)
+                   str(datetime.now().strftime('%d-%m-%Y_%H-%M-%S_')) + str(unnamed_counter + 1)
             new_names.append(name)
             unnamed_counter += 1
-        self.players = [model_class(dir_name) for dir_name in dir_names + new_names]
+
+        self.players = []
+        for dir_name in dir_names + new_names:
+            self.players.append(model_class(dir_name))
+
+        # self.players = [model_class(dir_name) for dir_name in dir_names + new_names]
         self.epochs = epochs
 
-    def learn(self):
+    def learn(self) -> Generator[Statistics.stats.StatsCompressed, None, None]:
         for ep in range(self.epochs):
-            self.epoch()
+            epoch_stats = self.epoch()
             random.shuffle(self.players)
+            yield epoch_stats
 
-    def epoch(self):
+    def epoch(self) -> Statistics.stats.StatsCompressed:
         for idx, first_player in enumerate(self.players):
             for second_player in self.players[idx:]:
                 self.play(first_player, second_player)
                 self.play(second_player, first_player)
+        return Statistics.stats.StatsCompressed()
 
     def play(self, crosses_player: BaseFacade, noughts_player: BaseFacade) -> Game:
         game = play(crosses_player, noughts_player)

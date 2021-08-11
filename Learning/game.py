@@ -1,6 +1,8 @@
+from utils.config import DEVICE_NAME
 from utils.player_role import PlayerRole
 from utils.step_validation import validate_step, check_game_result, revert_field
 import typing
+import torch
 import numpy as np
 
 
@@ -12,9 +14,16 @@ class Game:
         # list of tuples (x_step, y_step)
         self.steps_list: typing.List[typing.Tuple[int, int]] = list()
         self.end = False
-        self.field = np.zeros(shape=(self.FIELD_SIZE, self.FIELD_SIZE), dtype=np.int)
+        self.field = torch.Tensor(np.zeros(shape=(1, self.FIELD_SIZE ** 2), dtype=np.int))
+        self.field = self.field.to(torch.device(DEVICE_NAME))
         self.turn = PlayerRole.CROSSES
         self.winner = PlayerRole.NONE
+
+    def set_field(self, x: int, y: int, value: int):
+        self.field[0][x * self.FIELD_SIZE + y] = value
+
+    def get_field(self, x, y):
+        return self.field[0][x * self.FIELD_SIZE + y]
 
     def step(self, xy_step: typing.Tuple[int, int]):
         if self.end:
@@ -23,7 +32,7 @@ class Game:
             self.steps_list.append(xy_step)
 
             self.winner = check_game_result(self.field, xy_step, self.turn)
-            self.field[xy_step[0]][xy_step[1]] = 1
+            self.set_field(xy_step[0], xy_step[1], 1)
 
             if self.winner != PlayerRole.NONE:
                 self.end = True
@@ -42,10 +51,13 @@ class Game:
     def get_winner(self) -> PlayerRole:
         return self.winner
 
-    def get_steps(self) -> typing.Generator[typing.Tuple[np.ndarray, typing.Tuple[int, int]], None, None]:   # generator function
-        field_tmp = np.zeros(shape=(self.FIELD_SIZE, self.FIELD_SIZE), dtype=np.int)
+    # generator function
+    def get_steps(self) -> typing.Generator[typing.Tuple[torch.Tensor, typing.Tuple[int, int]], None, None]:
+        field_tmp = torch.Tensor(np.zeros(shape=(1, self.FIELD_SIZE ** 2), dtype=np.int))
+        field_tmp = field_tmp.to(torch.device(DEVICE_NAME))
+
         for step in self.steps_list:
             yield field_tmp, step
-            field_tmp[step[0]][step[1]] = 1
+            field_tmp[0][step[0] * self.FIELD_SIZE + step[1]] = 1
 
             field_tmp = revert_field(field_tmp)

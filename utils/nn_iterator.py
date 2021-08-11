@@ -6,10 +6,8 @@ import json
 def is_facade_path(name: str) -> bool:
     path = os.path.join("NNStructure", name)
 
-    print(name)
     if os.path.isdir(path):
         subfiles = os.listdir(path)
-        print(subfiles)
         return "facade.py" in subfiles
     return False
 

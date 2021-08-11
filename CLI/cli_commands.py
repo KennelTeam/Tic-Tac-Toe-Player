@@ -30,3 +30,16 @@ def print_colored(text, color="white", bg_color=""):
         print(colored(text, color))
     else:
         print(colored(text, color, bg_color))
+
+
+def success(message):
+    print_colored(message, "green")
+
+
+def warning(message):
+    print_colored(message, "yellow")
+
+
+def error(message):
+    print_colored(message, "red")
+    exit(1)
