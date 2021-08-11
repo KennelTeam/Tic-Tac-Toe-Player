@@ -20,6 +20,7 @@ class SimpleNeuroFacade(BaseFacade):
     def __init__(self, name: str, load_state=True, lr: float = 0.3):
         super().__init__(name)
         self.net = SimpleNeuroStruct()
+        self.net.cuda()
         self.loss_function = nn.BCELoss()
         self.lr = lr
 
@@ -36,9 +37,9 @@ class SimpleNeuroFacade(BaseFacade):
             else:
                 raise RuntimeError('Facade in neuro config is different')
         else:
-            os.mkdir('./Models/' + name)
-            os.mkdir('./Models/' + name + '/checkpoints')
-            shutil.copy('./Models/stats_template.csv', self.cdir + '/stats.csv')
+            os.mkdir("Models/" + name)
+            os.mkdir("Models/" + name + '/checkpoints')
+            shutil.copy('Models/stats_template.csv', self.cdir + 'stats.csv')
             config = {'name': name, 'facade_name': self.__class__.__name__}
             self.save_config(config)
 
