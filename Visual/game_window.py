@@ -1,10 +1,9 @@
-import os
-import typing
-from pathlib import Path
+
 from tkinter import *
 import tkinter
 from tkinter import Canvas
 from tkinter.ttk import Combobox
+import time
 
 from utils.nn_iterator import find_players
 from NNLoader.nn_loader import load_nn
@@ -30,9 +29,10 @@ class GameWindow:
     __field_canvas = Canvas(width=__field_size, height=__field_size, background="gray")
     game: Game
 
-    def __init__(self):
+    def __init__(self, game_load: Game = None):
         self.__crosses_player = None
         self.__noughts_player = None
+        self.game = None
         self.__tkinter_window.geometry("700x500")
 
         self.first_player = Combobox(self.__tkinter_window)
@@ -57,6 +57,8 @@ class GameWindow:
         for y in range(4, self.__field_size, self.__field_size // 15):
             self.__field_canvas.create_line(4, y, self.__field_size, y)
 
+        if game_load is not None:
+            self.__tkinter_window.after(1000, self.show_game(game_load))
         self.__tkinter_window.mainloop()
 
     def click_on_field(self, event):
@@ -97,3 +99,10 @@ class GameWindow:
 
         if not self.game.end_game():
             self.step()
+
+    def show_game(self, game: Game):
+        self.game = GamePainter(self.__field_canvas, self.__field_size)
+        for step in game.get_steps():
+            self.game.step(step[1])
+            self.__tkinter_window.update()
+            time.sleep(0.3)
