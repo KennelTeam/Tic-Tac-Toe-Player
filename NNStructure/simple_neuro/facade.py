@@ -4,6 +4,7 @@ import shutil
 import numpy as np
 import torch
 import os
+import pandas as pd
 from torch import nn
 
 from Learning.game import Game
@@ -16,6 +17,7 @@ class SimpleNeuroFacade(BaseFacade):
     loss_function: nn.BCELoss
     cdir: str
     net: SimpleNeuroStruct
+    statsTable: pd.DataFrame
 
     def __init__(self, name: str, load_state=True, lr: float = 0.3):
         super().__init__(name)
@@ -42,6 +44,8 @@ class SimpleNeuroFacade(BaseFacade):
             shutil.copy('Models/stats_template.csv', self.cdir + 'stats.csv')
             config = {'name': name, 'facade_name': self.__class__.__name__}
             self.save_config(config)
+
+        self.statsTable = pd.read_csv(self.cdir + 'stats.csv')
 
     def net_learn(self):
         self.net.train()
@@ -93,6 +97,9 @@ class SimpleNeuroFacade(BaseFacade):
         isMyTurn = myrole == PlayerRole.CROSSES
         iWin = game_history.get_winner() == myrole
         if iWin:
+            iters = 1
+            loss = 0
+            corr_anses = 0
             for field, inp_ans in game_history.get_steps():
                 if isMyTurn:
                     for i in range(15):
@@ -100,13 +107,27 @@ class SimpleNeuroFacade(BaseFacade):
                             fc = field.copy()
                             if fc[i][j] == 0:
                                 fc[i][j] = 1
+                                nloss = 0
+                                iscnas = 0
                                 if i == inp_ans[0] and j == inp_ans[1]:
-                                    self.one_learning_step(fc, True)
+                                    nloss, iscans = self.one_learning_step(fc, True)
                                 else:
-                                    self.one_learning_step(fc, False)
+                                    nloss, iscans = self.one_learning_step(fc, False)
+                                loss = (loss * iters + nloss) / (iters+1)
+                                corr_anses = (corr_anses * iters + iscnas) / (iters+1)
+                                iters += 1
                 isMyTurn = not isMyTurn
+            self.statsTable = self.statsTable.append({
+                'role': myrole,
+                'turns_in_game': len(game_history.steps_list),
+                'result': corr_anses,
+                'MSE': loss.item()
+            }, ignore_index=True)
+            print()
+            print(self.statsTable)
+            self.statsTable.to_csv(self.cdir + 'stats.csv')
 
-    def one_learning_step(self, field: np.ndarray, isgood: bool):
+    def one_learning_step(self, field: np.ndarray, isgood: bool) -> (float, float):
         field = self.prepare_field(field)
 
         output = self.net(field)
@@ -115,4 +136,4 @@ class SimpleNeuroFacade(BaseFacade):
 
         loss.backward()
 
-        return loss, output
+        return loss, abs(round(float(isgood) - output.item()))
