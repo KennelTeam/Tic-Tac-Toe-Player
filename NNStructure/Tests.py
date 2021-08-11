@@ -74,12 +74,12 @@ class Tests(unittest.TestCase):
 
     def test_update_config(self):
         os.chdir('../')
-        facade = SimpleNeuroFacade(name='neuroX4', loadState=False)
+        facade = SimpleNeuroFacade(name='neuroX4', load_state=False)
         facade.update_config('actual_state', 'x2.pt')
 
     def test_create_checkpoint(self):
         os.chdir('../')
-        facade = SimpleNeuroFacade(name='neuroX9', loadState=False)
+        facade = SimpleNeuroFacade(name='neuroX9', load_state=False)
         facade.create_checkpoint(1)
         facade2 = SimpleNeuroFacade(name='neuroX9')
         facade3 = SimpleNeuroFacade(name='neuroX10')

@@ -17,8 +17,8 @@ class SimpleNeuroFacade(BaseFacade):
     cdir: str
     net: SimpleNeuroStruct
 
-    def __init__(self, name: str, loadState = True, lr: float = 0.3):
-        super().__init__()
+    def __init__(self, name: str, load_state=True, lr: float = 0.3):
+        super().__init__(name)
         self.net = SimpleNeuroStruct()
         self.loss_function = nn.BCELoss()
         self.lr = lr
@@ -28,7 +28,7 @@ class SimpleNeuroFacade(BaseFacade):
         if name in exneuros:
             config = self.load_config()
             if config['facade_name'] == self.__class__.__name__ :
-                if loadState:
+                if load_state:
                     if 'actual_state' in config.keys():
                         statePath = self.cdir + 'checkpoints/' + config['actual_state']
                         self.net = torch.load(statePath)
