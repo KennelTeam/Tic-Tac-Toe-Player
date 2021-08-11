@@ -43,11 +43,7 @@ class Learning:
         return Statistics.stats.StatsCompressed()
 
     def play(self, crosses_player: BaseFacade, noughts_player: BaseFacade) -> Game:
-        print("a")
         game = play(crosses_player, noughts_player)
-        print("b")
         crosses_player.learn(game, PlayerRole.CROSSES)
-        print("c")
         noughts_player.learn(game, PlayerRole.NOUGHTS)
-        print("d")
         return game
