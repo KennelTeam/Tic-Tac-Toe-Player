@@ -4,10 +4,10 @@ import torch
 from torch import nn
 
 
-class SimpleNeuroStruct(nn.Module):
+class SupervisedNeuroStructure(nn.Module):
     def __init__(self):
-        super(SimpleNeuroStruct, self).__init__()
-        self.fc1 = nn.Linear(225, 1024, device=torch.device(DEVICE_NAME))
+        super(SupervisedNeuroStructure, self).__init__()
+        self.fc1 = nn.Linear(225 * 3, 1024, device=torch.device(DEVICE_NAME))
         self.fc2 = nn.Linear(1024, 1024, device=torch.device(DEVICE_NAME))
         self.fc3 = nn.Linear(1024, 1, device=torch.device(DEVICE_NAME))
 
