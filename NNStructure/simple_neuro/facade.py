@@ -19,7 +19,7 @@ class SimpleNeuroFacade(BaseFacade):
     cdir: str
     net: SimpleNeuroStruct
 
-    def __init__(self, name: str, load_state=True, lr: float = 0.3):
+    def __init__(self, name: str, load_state=True, lr: float = 0.3, version: int = -1):
         super().__init__(name)
         self.net = SimpleNeuroStruct()
 
@@ -32,8 +32,13 @@ class SimpleNeuroFacade(BaseFacade):
             config = self.load_config()
             if config['facade_name'] == self.__class__.__name__:
                 if load_state:
-                    if 'actual_state' in config.keys():
-                        statePath = self.cdir + 'checkpoints/' + config['actual_state']
+                    if version == 1:
+                        if 'actual_state' in config.keys():
+                            statePath = self.cdir + 'checkpoints/' + config['actual_state']
+                            self.net = torch.load(statePath)
+                            self.net.eval()
+                    else:
+                        statePath = self.cdir + 'checkpoints/' + 'chp' + str(version) + '.pth.tar'
                         self.net = torch.load(statePath)
                         self.net.eval()
 
