@@ -14,8 +14,8 @@ class SimpleNeuroFacade(BaseFacade):
     loss_function: nn.BCELoss
     optimizer: torch.optim.Adam
 
-    def __init__(self, lr: float):
-        super().__init__()
+    def __init__(self, lr: float, path: str):
+        super().__init__(path)
         self.net = SimpleNeuroStruct()
         self.loss_function = nn.BCELoss()
         self.lr = lr

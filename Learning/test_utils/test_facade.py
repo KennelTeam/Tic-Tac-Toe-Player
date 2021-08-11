@@ -7,7 +7,7 @@ import os
 
 class Facade1(BaseFacade):
     def __init__(self, dir_name):
-        super().__init__()
+        super().__init__(dir_name)
         self.dir_name = dir_name
         if dir_name not in os.listdir('Models'):
             os.mkdir('Models/' + dir_name)
