@@ -4,16 +4,15 @@ import os
 import json
 
 
-def load_nn(name: str) -> base_facade.BaseFacade:
+def load_nn(name: str, version:str = "") -> base_facade.BaseFacade:
     if not INITIALIZED:
         raise RuntimeError("Module NNStructure should be initialized by importing it")
     path = os.path.join("Models", os.path.join(name, "config.json"))
     if os.path.exists(path) and os.path.isfile(path):
         raise RuntimeError(f"Incorrect name of NN: {name}")
-    file = open(path, 'r')
-    data = json.loads(''.join(file.readlines()))
-    file.close()
+    with open(path, 'r') as file:
+        data = json.loads(file.read())
     facade_name = data['facade_name']
-    return NN_FACADES[facade_name](name)
+    return NN_FACADES[facade_name](name, version=version)
 
 
