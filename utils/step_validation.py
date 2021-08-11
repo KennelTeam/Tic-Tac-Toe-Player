@@ -1,31 +1,32 @@
 from typing import *
 from utils.player_role import PlayerRole
 import numpy as np
+import torch
+
+FIELD_SIZE = 15
+
+
+def validate_on_field(step: Tuple[int, int]) -> bool:
+    return 0 <= step[0] < FIELD_SIZE and 0 <= step[1] < FIELD_SIZE
 
 
 # true if step is correct
-def validate_step(field: np.ndarray, step: Tuple[int, int]) -> bool:
-    if 0 <= step[0] < field.shape[0] and 0 <= step[1] < field.shape[1]:
-        return field[step[0]][step[1]] == 0
+def validate_step(field: torch.Tensor, step: Tuple[int, int]) -> bool:
+    if validate_on_field(step):
+        return field[0][step[0] * FIELD_SIZE + step[1]] == 0
     return False
 
 
 # true if tie
-def check_tie(field: np.ndarray) -> bool:
-    for line in field:
-        for point in line:
-            if point == 0:
-                return False
-    return True
+def check_tie(field: torch.Tensor) -> bool:
+    return field.count_nonzero() == field.numel()
 
 
-def revert_field(field: np.ndarray) -> np.ndarray:
+def revert_field(field: torch.Tensor) -> torch.Tensor:
     return field * -1
 
 
-def check_game_result(field: np.ndarray, last_step: Tuple[int, int], last_player: PlayerRole) -> PlayerRole:
-
-    empty = np.zeros(field.shape)
+def check_game_result(field: torch.Tensor, last_step: Tuple[int, int], last_player: PlayerRole) -> PlayerRole:
 
     for dx in [-1, 0, 1]:
         for dy in [0, 1]:
@@ -33,7 +34,7 @@ def check_game_result(field: np.ndarray, last_step: Tuple[int, int], last_player
                 continue
 
             x, y = last_step
-            while validate_step(empty, (x, y)) and abs(x - last_step[0]) < 5 and abs(y - last_step[1]) < 5:
+            while validate_on_field((x, y)) and abs(x - last_step[0]) < 5 and abs(y - last_step[1]) < 5:
                 x -= dx
                 y -= dy
 
@@ -42,8 +43,8 @@ def check_game_result(field: np.ndarray, last_step: Tuple[int, int], last_player
 
             max_in_row = 0
             row = 0
-            while validate_step(empty, (x, y)) and abs(x - last_step[0]) < 5 and abs(y - last_step[1]) < 5:
-                if field[x][y] == 1 or (x, y) == last_step:
+            while validate_on_field((x, y)) and abs(x - last_step[0]) < 5 and abs(y - last_step[1]) < 5:
+                if field[0][x * FIELD_SIZE + y] == 1 or (x, y) == last_step:
                     row += 1
                     max_in_row = max(max_in_row, row)
                 else:
@@ -55,7 +56,7 @@ def check_game_result(field: np.ndarray, last_step: Tuple[int, int], last_player
             if max_in_row >= 5:
                 return last_player
 
-    field[last_step[0]][last_step[1]] = 1
+    field[0][last_step[0] * FIELD_SIZE + last_step[1]] = 1
     if check_tie(field):
         return PlayerRole.TIE
     else:
