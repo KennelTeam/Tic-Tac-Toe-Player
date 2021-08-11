@@ -3,10 +3,6 @@ from Visual import player
 from typing import *
 from utils.player_role import PlayerRole
 
-# map player names to paths to config files
-def find_players() -> Dict[str, str]:
-    pass
-
 
 class GameWindow:
     __field: List[List[int]]

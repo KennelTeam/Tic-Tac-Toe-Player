@@ -45,6 +45,7 @@ class Game:
     def get_steps(self) -> typing.Generator[typing.Tuple[np.ndarray, typing.Tuple[int, int]], None, None]:   # generator function
         field_tmp = np.zeros(shape=(self.FIELD_SIZE, self.FIELD_SIZE), dtype=np.int)
         for step in self.steps_list:
-            field_tmp[step[0]][step[1]] = 1
             yield field_tmp, step
+            field_tmp[step[0]][step[1]] = 1
+
             field_tmp = revert_field(field_tmp)

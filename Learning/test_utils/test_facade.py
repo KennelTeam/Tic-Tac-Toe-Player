@@ -2,11 +2,15 @@ from Learning.game import Game
 from utils.player_role import PlayerRole
 from NNStructure.base_facade import BaseFacade
 import numpy as np
+import os
 
 
 class Facade1(BaseFacade):
-    def __init__(self):
+    def __init__(self, dir_name):
         super().__init__()
+        self.dir_name = dir_name
+        if dir_name not in os.listdir('Models'):
+            os.mkdir('Models/' + dir_name)
 
     def make_move(self, field: np.ndarray):
         for x in range(len(field)):
