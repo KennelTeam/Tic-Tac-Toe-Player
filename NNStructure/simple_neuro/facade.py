@@ -1,7 +1,10 @@
+import json
+import shutil
 from typing import Tuple
 
 import numpy as np
 import torch
+import os
 from torch import nn
 
 from Learning.game import Game
@@ -14,11 +17,34 @@ class SimpleNeuroFacade(BaseFacade):
     loss_function: nn.BCELoss
     optimizer: torch.optim.Adam
 
-    def __init__(self, lr: float):
+    def __init__(self, lr: float, name: str):
         super().__init__()
         self.net = SimpleNeuroStruct()
         self.loss_function = nn.BCELoss()
         self.lr = lr
+
+        exneuros = os.listdir('./Models')
+        cpath = './Models/' + name + '/'
+        if name in exneuros:
+            configFile = open(cpath + 'config.json')
+            config = json.loads(configFile.read())
+            configFile.close()
+            if config['facade_name'] == self.__class__.__name__ :
+                if 'actual_state' in config.keys():
+                    statePath = cpath + 'checkpoints/' + config['actual_state']
+                    self.net.load_state_dict(torch.load(statePath))
+            else:
+                raise RuntimeError('Facade in neuro config is different')
+
+        else:
+            os.mkdir('./Models/' + name)
+            os.mkdir('./Models/' + name + '/checkpoints')
+            shutil.copy('./Models/stats_template.csv', cpath + '/stats.csv')
+            configFile = open(cpath + 'config.json', 'w')
+            config = {'name': name, 'facade_name': self.__class__.__name__}
+            configFile.write(json.dumps(config))
+            configFile.close()
+
 
     def net_learn(self):
         self.net.train()

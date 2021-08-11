@@ -1,5 +1,5 @@
 {
   "name": "neuro1",
-  "actual_state": "Models\\neuro1\\checkpoints\\chp1_epoch310.xxx",
-  "facade_name": "neuro1"
+  "actual_state": "chp1_epoch310.xxx",
+  "facade_name": "SimpleNeuroFacade"
 }

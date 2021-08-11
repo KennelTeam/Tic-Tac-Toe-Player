@@ -68,4 +68,8 @@ class Tests(unittest.TestCase):
             moves.add(move)
         print(moves)
 
+    def test_init_facade(self):
+        os.chdir('../')
+        facade = SimpleNeuroFacade(lr=0.3, name='neuroX4')
+
 
