@@ -20,8 +20,24 @@ class SimpleNeuroFacade(BaseFacade):
         self.loss_function = nn.BCELoss()
         self.lr = lr
 
+    def net_learn(self):
+        self.net.train()
+
+    def net_play(self):
+        self.net.eval()
+
     def make_move(self, field: np.ndarray) -> (int, int):
-        pass
+        best = ((-1, -1), -10)
+        for i in range(15):
+            for j in range(15):
+                fc = field.copy()
+                if fc[i][j] == 0:
+                    fc[i][j] = 1
+                    fc = self.prepare_field(fc)
+                    r = round(self.net(fc).item())
+                    if r > best[1]:
+                        best = ((i, j), r)
+        return best[0]
 
     def prepare_field(self, field: np.ndarray) -> torch.Tensor:
         res = np.zeros((1, 225), dtype='f')
@@ -32,16 +48,19 @@ class SimpleNeuroFacade(BaseFacade):
     def learn(self, game_history: Game, myrole: PlayerRole):
         isMyTurn = myrole == PlayerRole.CROSSES
         iWin = game_history.get_winner() == myrole
-        for field, inp_ans in game_history.get_steps():
-            if isMyTurn:
-                fc = field.copy()
-                for i in range(15):
-                    for j in range(15):
-                        if fc[i][j] == 0:
-                            fc[i][j] = 1
-                            self.one_learning_step(fc, iWin)
-                            fc[i][j] = 0
-            isMyTurn = not isMyTurn
+        if iWin:
+            for field, inp_ans in game_history.get_steps():
+                if isMyTurn:
+                    for i in range(15):
+                        for j in range(15):
+                            fc = field.copy()
+                            if fc[i][j] == 0:
+                                fc[i][j] = 1
+                                if i == inp_ans[0] and j == inp_ans[1]:
+                                    self.one_learning_step(fc, True)
+                                else:
+                                    self.one_learning_step(fc, False)
+                isMyTurn = not isMyTurn
 
     def one_learning_step(self, field: np.ndarray, isgood: bool):
         field = self.prepare_field(field)

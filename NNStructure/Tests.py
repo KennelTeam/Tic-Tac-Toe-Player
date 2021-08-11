@@ -56,3 +56,16 @@ class Tests(unittest.TestCase):
         game.step((11, 11))
         tf = SimpleNeuroFacade(lr=0.3)
         tf.learn(game, PlayerRole.CROSSES)
+
+    def test_make_move(self):
+        moves = set()
+        for _ in range(100):
+            obj = SimpleNeuroFacade(lr=0.3)
+            field = np.zeros((15, 15), float)
+            field[1][0] = 1
+            field[0][1] = -1
+            move = obj.make_move(field)
+            moves.add(move)
+        print(moves)
+
+
