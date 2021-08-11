@@ -8,7 +8,7 @@ import numpy as np
 
 
 class BaseFacade(BasePlayer):
-    def __init__(self, path: str):
+    def __init__(self, name: str):
         super().__init__()
         self.net = nn.Module()
         pass

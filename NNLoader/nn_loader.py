@@ -1,4 +1,5 @@
-from NNStructure import base_facade, NN_FACADES, INITIALIZED
+from NNStructure import base_facade
+from NNLoader import NN_FACADES, INITIALIZED
 import os
 import json
 

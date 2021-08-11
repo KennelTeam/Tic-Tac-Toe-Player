@@ -8,15 +8,16 @@ from NNStructure.simple_neuro.facade import *
 class Tests(unittest.TestCase):
 
     def test_field_prepare(self):
-        obj = SimpleNeuroFacade()
+        os.chdir('../')
+        obj = SimpleNeuroFacade(name='t1')
         field = np.zeros((15, 15), float)
         field[1][0] = 1
         field[0][1] = -1
         r = obj.prepare_field(field)
-        self.assertEqual(len(r), 225)
-        self.assertEqual(r[1], -1)
-        self.assertEqual(r[15], 1)
-        self.assertEqual(r[30], 0)
+        self.assertEqual(tuple(r.size()), (1, 225))
+        self.assertEqual(r[0, 1], -1)
+        self.assertEqual(r[0, 15], 1)
+        self.assertEqual(r[0, 30], 0)
 
     def test_neuro(self):
         neuro = SimpleNeuroStruct()
@@ -25,11 +26,12 @@ class Tests(unittest.TestCase):
         # print(r)
 
     def test_one_learning_step(self):
+        os.chdir('../')
         imax = -100
         imin = 100
         mloss = 0
         for _ in range(100):
-            obj = SimpleNeuroFacade(lr=0.3)
+            obj = SimpleNeuroFacade(name='t1')
             field = np.zeros((15, 15), float)
             field[1][0] = 1
             field[0][1] = -1
@@ -45,6 +47,7 @@ class Tests(unittest.TestCase):
         # print(imin, imax, mloss)
 
     def test_learn(self):
+        os.chdir('../')
         game = Game()
         game.step((7, 7))
         game.step((6, 6))
@@ -54,13 +57,14 @@ class Tests(unittest.TestCase):
         game.step((10, 10))
         game.step((10, 11))
         game.step((11, 11))
-        tf = SimpleNeuroFacade(lr=0.3)
+        tf = SimpleNeuroFacade(lr=0.3, name='t1')
         tf.learn(game, PlayerRole.CROSSES)
 
     def test_make_move(self):
+        os.chdir('../')
         moves = set()
         for _ in range(100):
-            obj = SimpleNeuroFacade(lr=0.3)
+            obj = SimpleNeuroFacade(name='t1')
             field = np.zeros((15, 15), float)
             field[1][0] = 1
             field[0][1] = -1
