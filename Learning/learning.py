@@ -36,7 +36,7 @@ class Learning:
     def learn(self) -> Generator[PlayerRole, None, None]:
         chp_number = 1
         for ep in range(self.epochs):
-            for winner in self.epoch_async():
+            for winner in self.epoch():
                 yield winner
             if ep / self.epochs >= 1 / self.K_CHECKPOINTS * chp_number:
                 for player in self.players:
@@ -56,7 +56,7 @@ class Learning:
             thread.join()
             yield PlayerRole.NONE
 
-    def epoch(self) -> Statistics.stats.StatsCompressed:
+    def epoch(self) -> Generator[PlayerRole, None, None]:
         for first_player in self.players:
             for second_player in self.players:
                 # print(first_player.cdir, second_player.cdir)

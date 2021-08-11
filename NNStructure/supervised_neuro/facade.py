@@ -112,26 +112,24 @@ class SupervisedNeuroFacade(BaseFacade):
         loss = 0
         corr_anses = 0
         for field, inp_ans in game_history.get_steps():
-            if isMyTurn:
-                # field = self.prepare_field(field)
-                for i in range(15):
-                    for j in range(15):
-                        # fc = field.copy()
-                        if field[0][i * 15 + j] == 0:
-                            field[0][i * 15 + j] = 1
-                            nloss = 0
-                            iscnas = 0
-                            if i == inp_ans[0] and j == inp_ans[1]:
-                                self.one_learning_step(field, True)
-                                nloss, iscans = self.one_learning_step(field, True)
-                            else:
-                                self.one_learning_step(field, False)
-                            field[0][i * 15 + j] = 0
-                            nloss, iscans = self.one_learning_step(field, False)
-                            loss = (loss * iters + nloss) / (iters + 1)
-                            corr_anses = (corr_anses * iters + iscnas) / (iters + 1)
-                            iters += 1
-            isMyTurn = not isMyTurn
+            # field = self.prepare_field(field)
+            for i in range(15):
+                for j in range(15):
+                    # fc = field.copy()
+                    if field[0][i * 15 + j] == 0:
+                        field[0][i * 15 + j] = 1
+                        nloss = 0
+                        iscnas = 0
+                        if i == inp_ans[0] and j == inp_ans[1]:
+                            self.one_learning_step(field, True)
+                            nloss, iscans = self.one_learning_step(field, True)
+                        else:
+                            self.one_learning_step(field, False)
+                        field[0][i * 15 + j] = 0
+                        nloss, iscans = self.one_learning_step(field, False)
+                        loss = (loss * iters + nloss) / (iters + 1)
+                        corr_anses = (corr_anses * iters + iscnas) / (iters + 1)
+                        iters += 1
 
     def one_learning_step(self, field: torch.Tensor, isgood: bool) -> (float, float):
         optimizer = torch.optim.Adam(self.net.parameters(), lr=self.lr)
