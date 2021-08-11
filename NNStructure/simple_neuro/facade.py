@@ -20,7 +20,7 @@ class SimpleNeuroFacade(BaseFacade):
     def __init__(self, name: str, load_state=True, lr: float = 0.3):
         super().__init__(name)
         self.net = SimpleNeuroStruct()
-        self.net.cuda()
+
         self.loss_function = nn.BCELoss()
         self.lr = lr
 
@@ -34,6 +34,7 @@ class SimpleNeuroFacade(BaseFacade):
                         statePath = self.cdir + 'checkpoints/' + config['actual_state']
                         self.net = torch.load(statePath)
                         self.net.eval()
+
             else:
                 raise RuntimeError('Facade in neuro config is different')
         else:
@@ -42,6 +43,9 @@ class SimpleNeuroFacade(BaseFacade):
             shutil.copy('Models/stats_template.csv', self.cdir + 'stats.csv')
             config = {'name': name, 'facade_name': self.__class__.__name__}
             self.save_config(config)
+
+        self.net.to(torch.device("cuda"))
+        self.net.cuda(0)
 
     def net_learn(self):
         self.net.train()
@@ -72,22 +76,26 @@ class SimpleNeuroFacade(BaseFacade):
 
     def make_move(self, field: np.ndarray) -> (int, int):
         best = ((-1, -1), -10)
+        field = self.prepare_field(field)
+
         for i in range(15):
             for j in range(15):
-                fc = field.copy()
-                if fc[i][j] == 0:
-                    fc[i][j] = 1
-                    fc = self.prepare_field(fc)
-                    r = round(self.net(fc).item())
+                # fc = field.copy()
+                if field[0][i * 15 + j] == 0:
+                    field[0][i * 15 + j] = 1
+                    # fc = self.prepare_field(field)
+                    r = round(self.net(field).item())
                     if r > best[1]:
                         best = ((i, j), r)
+                    field[0][i * 15 + j] = 0
         return best[0]
 
     def prepare_field(self, field: np.ndarray) -> torch.Tensor:
         res = np.zeros((1, 225), dtype='f')
         for i, val in enumerate(np.nditer(field)):
             res[0, i] = val
-        return torch.tensor(res)
+        result = torch.tensor(res, device=torch.device('cuda'))
+        return result
 
     def learn(self, game_history: Game, myrole: PlayerRole):
         isMyTurn = myrole == PlayerRole.CROSSES
@@ -95,22 +103,24 @@ class SimpleNeuroFacade(BaseFacade):
         if iWin:
             for field, inp_ans in game_history.get_steps():
                 if isMyTurn:
+                    field = self.prepare_field(field)
                     for i in range(15):
                         for j in range(15):
-                            fc = field.copy()
-                            if fc[i][j] == 0:
-                                fc[i][j] = 1
+                            # fc = field.copy()
+                            if field[0][i * 15 + j] == 0:
+                                field[0][i * 15 + j] = 1
                                 if i == inp_ans[0] and j == inp_ans[1]:
-                                    self.one_learning_step(fc, True)
+                                    self.one_learning_step(field, True)
                                 else:
-                                    self.one_learning_step(fc, False)
+                                    self.one_learning_step(field, False)
+                                field[0][i * 15 + j] = 0
                 isMyTurn = not isMyTurn
 
-    def one_learning_step(self, field: np.ndarray, isgood: bool):
-        field = self.prepare_field(field)
+    def one_learning_step(self, field: torch.Tensor, isgood: bool):
+        # field = self.prepare_field(field)
 
         output = self.net(field)
-        p2 = torch.tensor([[float(isgood)]])
+        p2 = torch.tensor([[float(isgood)]], device=torch.device("cuda"))
         loss = self.loss_function(output, p2)
 
         loss.backward()

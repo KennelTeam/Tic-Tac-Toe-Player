@@ -1,5 +1,9 @@
 import os
 import sys
+
+import torch
+import pycuda.driver as cuda
+
 main_path = os.path.join(sys.path[0], '..')
 sys.path.insert(0, os.path.abspath(main_path))
 
@@ -52,6 +56,9 @@ def check_args_warning(args, names):
 
 if __name__ == '__main__':
     init()
+    cuda.init()
+    torch.cuda.set_device(0)
+
     parser = argparse.ArgumentParser(description="Run learning process")
     parser.add_argument("-e", type=int, help="Number of epochs")
     parser.add_argument("-p", type=int, help="Number of players (NN's)")
