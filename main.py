@@ -10,8 +10,8 @@ os.chdir('TicTacToe')
 print(os.getcwd())
 batch_size = 10
 print('Starting reading')
-gamesJson = json.loads(open('C:/Users/alexe/Documents/Hackatons/TicTacToe/data.json').read())
-net = SimpleNeuroFacade(name='N1')
+gamesJson = json.loads(open('data.json').read())
+net = SimpleNeuroFacade(name='N2')
 print('Starting learning')
 for batch_index in tqdm(range(len(gamesJson) // batch_size)):
     batch = gamesJson[batch_index * batch_size: (batch_index + 1) * batch_size]
