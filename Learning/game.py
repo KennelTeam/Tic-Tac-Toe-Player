@@ -6,7 +6,7 @@ import numpy as np
 
 class Game:
 
-    FIELD_SIZE = 5
+    FIELD_SIZE = 15
 
     def __init__(self):
         # list of tuples (x_step, y_step)
@@ -24,7 +24,6 @@ class Game:
 
             self.winner = check_game_result(self.field, xy_step, self.turn)
             self.field[xy_step[0]][xy_step[1]] = 1
-            print(f"winner: {self.winner}")
 
             if self.winner != PlayerRole.NONE:
                 self.end = True
@@ -50,4 +49,3 @@ class Game:
             field_tmp[step[0]][step[1]] = 1
 
             field_tmp = revert_field(field_tmp)
-        raise StopIteration()
