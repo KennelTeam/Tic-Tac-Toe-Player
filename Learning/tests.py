@@ -2,6 +2,7 @@ import pytest
 from Learning.learning import Learning
 from Learning.test_utils.test_facade import Facade1
 from Learning.game import Game
+import os
 from utils.player_role import PlayerRole
 
 
@@ -22,6 +23,7 @@ def test_game_tie():
             game.step((x, y))
     print(game.field)
     assert game.end_game()
+    assert game.is_tie()
     assert game.get_winner() == PlayerRole.TIE
 
 
@@ -51,5 +53,27 @@ def test_game_not_tie():
     assert game.get_winner() == PlayerRole.CROSSES
 
 
-def test_making_dirs():
-    learner = Learning(Facade1, 5, 1)
+def test_game_noughts_won():
+    game = Game()
+    steps_list = ((0, 0), (1, 0), (0, 2), (2, 1), (0, 3), (3, 2), (0, 4), (4, 3), (0, 5), (5, 4))
+    for step in steps_list:
+        assert not game.end_game()
+        game.step(step)
+    assert game.end_game()
+    assert game.get_winner() == PlayerRole.NOUGHTS
+
+
+
+def test_making_directories():
+    if 'test_dir1' not in os.listdir('Models'):
+        os.mkdir('Models/test_dir1')
+    if 'test_dir2' in os.listdir('Models'):
+        os.rmdir('Models/test_dir2')
+    len_listdir = len(os.listdir('Models'))
+    learner = Learning(Facade1, 5, 1, ['test_dir1', 'test_dir2'])
+    assert 'test_dir1' in os.listdir('Models')
+    assert 'test_dir2' in os.listdir('Models')
+    print(len(os.listdir('Models')), len_listdir)
+    assert len(os.listdir('Models')) == len_listdir + 4
+    for pl in learner.players:
+        os.rmdir('Models/' + pl.dir_name)
