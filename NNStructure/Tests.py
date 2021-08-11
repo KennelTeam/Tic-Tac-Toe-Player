@@ -41,8 +41,8 @@ class Tests(unittest.TestCase):
                 imin = output
             if output > imax:
                 imax = output
-            # print(loss)
-            # print(output)
+            print(loss)
+            print(output)
             mloss += loss / 100
         # print(imin, imax, mloss)
 
@@ -54,6 +54,7 @@ class Tests(unittest.TestCase):
         game.step((8, 8))
         game.step((8, 9))
         game.step((9, 9))
+        game.step((9, 10))
         game.step((10, 10))
         game.step((10, 11))
         game.step((11, 11))
@@ -74,7 +75,7 @@ class Tests(unittest.TestCase):
 
     def test_init_facade(self):
         os.chdir('../')
-        facade = SimpleNeuroFacade(lr=0.3, name='neuroX4')
+        facade = SimpleNeuroFacade(lr=0.3, name='neuroX9')
 
     def test_update_config(self):
         os.chdir('../')
