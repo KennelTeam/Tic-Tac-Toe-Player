@@ -17,10 +17,6 @@ class SimpleNeuroFacade(BaseFacade):
     def __init__(self, lr: float):
         super().__init__()
         self.net = SimpleNeuroStruct()
-        for el in self.net.layers[0].parameters():
-            print("azazazaza")
-            print(el)
-        print("******")
         self.loss_function = nn.BCELoss()
         self.lr = lr
 
@@ -33,21 +29,25 @@ class SimpleNeuroFacade(BaseFacade):
             res[0, i] = val
         return torch.tensor(res)
 
-    def learn(self, game_history: Game, your_role: PlayerRole):
+    def learn(self, game_history: Game, myrole: PlayerRole):
+        isMyTurn = myrole == PlayerRole.CROSSES
+        iWin = game_history.get_winner() == myrole
         for field, inp_ans in game_history.get_steps():
-            fc = field.clone()
-            for i, j in range(15):
-                if fc[i][j] == 0:
-                    fc[i][j] = 1
-
-            self.one_learning_step(field, inp_ans)
+            if isMyTurn:
+                fc = field.copy()
+                for i in range(15):
+                    for j in range(15):
+                        if fc[i][j] == 0:
+                            fc[i][j] = 1
+                            self.one_learning_step(fc, iWin)
+                            fc[i][j] = 0
+            isMyTurn = not isMyTurn
 
     def one_learning_step(self, field: np.ndarray, isgood: bool):
         field = self.prepare_field(field)
 
         output = self.net(field)
         p2 = torch.tensor([[float(isgood)]])
-        print(output)
         loss = self.loss_function(output, p2)
 
         loss.backward()
