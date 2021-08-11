@@ -1,7 +1,10 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+from Visual.game_window import GameWindow
 
-statsPath = 'C:/Users/alexe/Documents/Hackatons/TicTacToe/Models/t1/stats.csv'
+GameWindow()
+
+statsPath = 'Models/t1/stats.csv'
 open(statsPath)
 data = pd.read_csv(statsPath)
 data = data[['turns_in  _game', 'result', 'MSE']]
