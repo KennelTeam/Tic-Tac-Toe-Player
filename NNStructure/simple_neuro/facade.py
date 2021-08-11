@@ -33,7 +33,7 @@ class SimpleNeuroFacade(BaseFacade):
             config = self.load_config()
             if config['facade_name'] == self.__class__.__name__:
                 if load_state:
-                    if version == 1:
+                    if version == -1:
                         if 'actual_state' in config.keys():
                             statePath = self.cdir + 'checkpoints/' + config['actual_state']
                             self.net = torch.load(statePath)

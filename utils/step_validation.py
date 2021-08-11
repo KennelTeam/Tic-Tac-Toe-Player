@@ -27,7 +27,7 @@ def revert_field(field: torch.Tensor) -> torch.Tensor:
 
 
 def check_game_result(field: torch.Tensor, last_step: Tuple[int, int], last_player: PlayerRole) -> PlayerRole:
-
+    # return PlayerRole.NONE
     for dx in [-1, 0, 1]:
         for dy in [0, 1]:
             if (dx == 0 and dy == 0) or (dx == 1 and dy == 0):

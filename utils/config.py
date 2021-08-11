@@ -1,1 +1,1 @@
-DEVICE_NAME = "cpu"
+DEVICE_NAME = "cuda"

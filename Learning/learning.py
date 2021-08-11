@@ -38,11 +38,12 @@ class Learning:
         for ep in range(self.epochs):
             for winner in self.epoch():
                 yield winner
-            if ep / self.epochs >= 1 / self.K_CHECKPOINTS * chp_number:
+            if (ep + 1) / self.epochs >= chp_number / self.K_CHECKPOINTS:
                 for player in self.players:
                     player.create_checkpoint(ep + 1)
                 chp_number += 1
             random.shuffle(self.players)
+            chp_number += 1
 
     def epoch_async(self) -> Generator[PlayerRole, None, None]:
         threads = []

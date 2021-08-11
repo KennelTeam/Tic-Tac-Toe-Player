@@ -57,5 +57,4 @@ class Game:
         for step in self.steps_list:
             yield field_tmp, step
             field_tmp[0][step[0] * self.FIELD_SIZE + step[1]] = 1
-
             field_tmp = revert_field(field_tmp)
