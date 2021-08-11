@@ -4,7 +4,7 @@ import os
 import json
 
 
-def load_nn(name: str, version:str = "") -> base_facade.BaseFacade:
+def load_nn(name: str, version: int = -1) -> base_facade.BaseFacade:
     if not INITIALIZED:
         raise RuntimeError("Module NNStructure should be initialized by importing it")
     path = os.path.join("Models", os.path.join(name, "config.json"))
