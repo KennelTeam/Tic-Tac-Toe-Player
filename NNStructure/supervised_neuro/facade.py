@@ -20,7 +20,7 @@ class SupervisedNeuroFacade(BaseFacade):
     net: SupervisedNeuroStructure
     statsTable: pd.DataFrame
 
-    def __init__(self, name: str, load_state=True, lr: float = 10.0, version: int = -1):
+    def __init__(self, name: str, load_state=True, lr: float = 0.00001, version: int = -1):
         super().__init__(name)
         self.net = SupervisedNeuroStructure()
 
@@ -33,7 +33,7 @@ class SupervisedNeuroFacade(BaseFacade):
             config = self.load_config()
             if config['facade_name'] == self.__class__.__name__:
                 if load_state:
-                    if version == 1:
+                    if version == -1:
                         if 'actual_state' in config.keys():
                             statePath = self.cdir + 'checkpoints/' + config['actual_state']
                             self.net = torch.load(statePath)
@@ -54,6 +54,7 @@ class SupervisedNeuroFacade(BaseFacade):
 
         self.net = self.net.to(torch.device(DEVICE_NAME))
         self.statsTable = pd.read_csv(self.cdir + 'stats.csv')
+        self.optimizer = torch.optim.Adam(self.net.parameters(), lr=self.lr)
 
         # self.net.cuda(0)
 
@@ -80,6 +81,7 @@ class SupervisedNeuroFacade(BaseFacade):
         self.save_config(config)
 
     def create_checkpoint(self, index: int):
+        print("create_checkpoint")
         fname = 'chp' + str(index) + '.pth.tar'
         torch.save(self.net, self.cdir + 'checkpoints/' + fname)
         self.update_config('actual_state', fname)
@@ -93,19 +95,22 @@ class SupervisedNeuroFacade(BaseFacade):
                 # fc = field.copy()
                 if field[0][i * 15 + j] == 0:
                     field[0][i * 15 + j] = 1
-                    field[0][225 + i * 15 + j] = 1
+                    # field[0][225 + i * 15 + j] = 1
                     r = self.net(field).item()
-                    if r > best[1]:
+                    if r >= best[1]:
                         best = ((i, j), r)
                     field[0][i * 15 + j] = 0
-                    field[0][225 + i * 15 + j] = 0
+                    # field[0][225 + i * 15 + j] = 0
 
         return best[0]
 
     def prepare_field(self, field: torch.Tensor) -> torch.Tensor:
-        return torch.cat((field, torch.div((field + 1), 2), torch.div((field - 1), 2)), 1)
+        # return torch.cat((field, torch.div((field + 1), 2), torch.div((field - 1), 2)), 1)
+        return field
 
     def learn(self, game_history: Game, myrole: PlayerRole):
+        # if myrole != game_history.get_winner():
+        #     return
         iters = 1
         loss = 0
         corr_anses = 0
@@ -116,7 +121,7 @@ class SupervisedNeuroFacade(BaseFacade):
                     # fc = field.copy()
                     if field[0][i * 15 + j] == 0:
                         field[0][i * 15 + j] = 1
-                        field[0][225 + i * 15 + j] = 1
+                        # field[0][225 + i * 15 + j] = 1
                         nloss = 0
                         iscnas = 0
                         if i == inp_ans[0] and j == inp_ans[1]:
@@ -125,21 +130,22 @@ class SupervisedNeuroFacade(BaseFacade):
                             nloss, iscans = self.one_learning_step(field, False)
 
                         field[0][i * 15 + j] = 0
-                        field[0][225 + i * 15 + j] = 0
+                        # field[0][225 + i * 15 + j] = 0
 
                         loss = (loss * iters + nloss) / (iters + 1)
                         corr_anses = (corr_anses * iters + iscnas) / (iters + 1)
                         iters += 1
 
     def one_learning_step(self, field: torch.Tensor, isgood: bool) -> (float, float):
-        optimizer = torch.optim.Adam(self.net.parameters(), lr=self.lr)
-        optimizer.zero_grad()
-        # field = self.prepare_field(field)
-        field = field.to(torch.device(DEVICE_NAME))
+        for param in self.net.parameters():
+            param.grad = None
+
         output = self.net(field)
         p2 = torch.tensor([[float(isgood)]], device=torch.device(DEVICE_NAME))
+
         loss = self.loss_function(output, p2)
         loss.backward()
-        optimizer.step()
+
+        self.optimizer.step()
 
         return loss, abs(round(float(isgood) - output.item()))

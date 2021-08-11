@@ -38,7 +38,7 @@ class Learning:
         for ep in range(self.epochs):
             for winner in self.epoch():
                 yield winner
-            if ep / self.epochs >= chp_number / self.K_CHECKPOINTS:
+            if (ep + 1) / self.epochs >= chp_number / self.K_CHECKPOINTS:
                 for player in self.players:
                     player.create_checkpoint(chp_number)
             random.shuffle(self.players)

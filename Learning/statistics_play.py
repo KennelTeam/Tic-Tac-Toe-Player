@@ -16,11 +16,12 @@ def statistics_play(dir_name):
     stats = stats.fillna(0)
     for idx_first, first_player in enumerate(players):
         vers_first = versions[idx_first]
-        for idx_second, second_player in players:
+        for idx_second, second_player in enumerate(players):
             if idx_first == idx_second:
                 continue
-            vers_second = versions[idx_first + idx_second + 1]
+            vers_second = versions[idx_second]
             game = play(first_player, second_player)
+            print(idx_first, idx_second)
             if game.is_tie():
                 stats["Tie"][vers_first] += 1
                 stats["Tie"][vers_second] += 1
