@@ -16,7 +16,7 @@ def check_tie(field: np.ndarray) -> bool:
         for point in line:
             if point == 0:
                 return False
-    return False
+    return True
 
 
 def revert_field(field: np.ndarray) -> np.ndarray:
@@ -55,6 +55,7 @@ def check_game_result(field: np.ndarray, last_step: Tuple[int, int], last_player
             if max_in_row >= 5:
                 return last_player
 
+    field[last_step[0]][last_step[1]] = 1
     if check_tie(field):
         return PlayerRole.TIE
     else:
