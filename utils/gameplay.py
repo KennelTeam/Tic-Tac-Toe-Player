@@ -9,6 +9,6 @@ def play(crosses_player: BasePlayer, noughts_player: BasePlayer) -> Game:
         if game.turn == PlayerRole.CROSSES:
             move = crosses_player.make_move(game.field)
         else:
-            move = noughts_player.make_move(- game.field)
+            move = noughts_player.make_move(game.field)
         game.step(move)
     return game
