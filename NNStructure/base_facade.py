@@ -21,3 +21,6 @@ class BaseFacade(BasePlayer):
 
     def learn(self, game_history: Game, your_role: PlayerRole):
         pass
+
+    def create_checkpoint(self, index: int):
+        pass
