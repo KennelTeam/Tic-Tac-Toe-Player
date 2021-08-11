@@ -86,47 +86,47 @@ class SupervisedNeuroFacade(BaseFacade):
 
     def make_move(self, field: torch.Tensor) -> (int, int):
         best = ((-1, -1), -10)
+        field = self.prepare_field(field)
 
         for i in range(15):
             for j in range(15):
                 # fc = field.copy()
                 if field[0][i * 15 + j] == 0:
                     field[0][i * 15 + j] = 1
+                    field[0][225 + i * 15 + j] = 1
                     r = self.net(field).item()
                     if r > best[1]:
                         best = ((i, j), r)
                     field[0][i * 15 + j] = 0
+                    field[0][225 + i * 15 + j] = 0
 
         return best[0]
 
-    # legacy!!!
-    def prepare_field(self, field: np.ndarray) -> torch.Tensor:
-        res = np.zeros((1, 225), dtype='f')
-        for i, val in enumerate(np.nditer(field)):
-            res[0, i] = val
-        result = torch.tensor(res, device=torch.device(DEVICE_NAME))
-        return result
+    def prepare_field(self, field: torch.Tensor) -> torch.Tensor:
+        return torch.cat((field, torch.div((field + 1), 2), torch.div((field - 1), 2)), 1)
 
     def learn(self, game_history: Game, myrole: PlayerRole):
         iters = 1
         loss = 0
         corr_anses = 0
         for field, inp_ans in game_history.get_steps():
-            # field = self.prepare_field(field)
+            field = self.prepare_field(field)
             for i in range(15):
                 for j in range(15):
                     # fc = field.copy()
                     if field[0][i * 15 + j] == 0:
                         field[0][i * 15 + j] = 1
+                        field[0][225 + i * 15 + j] = 1
                         nloss = 0
                         iscnas = 0
                         if i == inp_ans[0] and j == inp_ans[1]:
-                            self.one_learning_step(field, True)
                             nloss, iscans = self.one_learning_step(field, True)
                         else:
-                            self.one_learning_step(field, False)
+                            nloss, iscans = self.one_learning_step(field, False)
+
                         field[0][i * 15 + j] = 0
-                        nloss, iscans = self.one_learning_step(field, False)
+                        field[0][225 + i * 15 + j] = 0
+
                         loss = (loss * iters + nloss) / (iters + 1)
                         corr_anses = (corr_anses * iters + iscnas) / (iters + 1)
                         iters += 1
