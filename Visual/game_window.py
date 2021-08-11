@@ -1,3 +1,4 @@
+import asyncio
 import os
 import typing
 from pathlib import Path
@@ -13,6 +14,9 @@ from utils.player_role import PlayerRole
 from utils import gameplay
 from user_player import UserPlayer
 from nn_player import NNPlayer
+import _thread
+
+import tkinter as tk
 
 
 # map player names to paths to config files
@@ -20,7 +24,7 @@ def find_players() -> Dict[str, str]:
     pass
 
 
-class GameWindow:
+class GameWindow(tk.Tk):
     __field: List[List[int]]
     __cross_player: player.BasePlayer
     __noughts_player: player.BasePlayer
@@ -38,15 +42,15 @@ class GameWindow:
     game: Game
 
     def __init__(self, crosses_player: player.BasePlayer, noughts_player: player.BasePlayer):
+        super().__init__()
         self.__crosses_player = crosses_player
         self.__noughts_player = noughts_player
 
-    def render(self) -> None:
         self.__tkinter_window.geometry("700x500")
 
         first_player = Combobox(self.__tkinter_window)
         second_player = Combobox(self.__tkinter_window)
-        start_button = Button(self.__tkinter_window, text="Start", command=self.start_game)
+        start_button = Button(self.__tkinter_window, text="Start", command=self.event_catcher())
 
         neuros_list = os.listdir(str(Path(os.getcwd()).parent) + "\Models")
         neuros_list.insert(0, "User")
@@ -67,11 +71,14 @@ class GameWindow:
         for y in range(4, self.__field_size, self.__field_size // 15):
             self.__field_canvas.create_line(4, y, self.__field_size, y)
 
-        self.__tkinter_window.mainloop()
+    def event_catcher(self):
+        print('got event')
+        self.start_game()
 
     def start_game(self):
-
+        print('game started')
         self.game = Game()
+
         crosses_player = UserPlayer(self.__field_canvas, self.__field_size, PlayerRole.CROSSES, self.step)
         noughts_player = UserPlayer(self.__field_canvas, self.__field_size, PlayerRole.NOUGHTS, self.step)
         while not self.game.end_game():
@@ -102,4 +109,4 @@ class GameWindow:
 
 
 game_window = GameWindow(player.BasePlayer(), player.BasePlayer())
-game_window.render()
+game_window.mainloop()

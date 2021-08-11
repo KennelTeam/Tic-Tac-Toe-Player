@@ -1,3 +1,5 @@
+import _thread
+import asyncio
 import time
 import tkinter
 
@@ -27,15 +29,18 @@ class UserPlayer(BasePlayer):
         self.__canvas.bind("<Button-1>", self.on_click)
         self.waiting_move = thr.Event()
 
-    async def make_move(self, field: np.ndarray) -> typing.Tuple[int, int]:
-        return await self.movvvve()
+    def make_move(self, field: np.ndarray) -> typing.Tuple[int, int]:
+        return self.__move
 
-    async def movvvve(self):
+    def movvvve(self):
+        print('wloop started')
         while not self.waiting_move.is_set():
             self.waiting_move.wait(60)
+        print('wloop finished')
         return self.__move
 
     def on_click(self, event):
+        print('clicked')
         x, y = event.x // (self.__canvas_size // 15), event.y // (self.__canvas_size // 15)
         if self.__role == PlayerRole.CROSSES:
             self.draw_cross(x, y)
