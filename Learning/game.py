@@ -25,7 +25,7 @@ class Game:
     def winner(self) -> PlayerRole:
         return self.winner
 
-    def get_steps(self) -> typing.Generator[list]:   # generator function
+    def get_steps(self):   # generator function
         while False:
             yield None
         raise StopIteration()

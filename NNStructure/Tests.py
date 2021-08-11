@@ -23,3 +23,26 @@ class Tests(unittest.TestCase):
         data = torch.tensor(np.zeros((1, 225), dtype='f'))
         r = neuro(data)
         # print(r)
+
+    def test_one_learning_step(self):
+        imax = -100
+        imin = 100
+        mloss = 0
+        # for _ in range(100):
+        obj = SimpleNeuroFacade(lr=0.3)
+        field = np.zeros((15, 15), float)
+        field[1][0] = 1
+        field[0][1] = -1
+        correct = True
+        loss, output = obj.one_learning_step(field, correct)
+        if output < imin:
+            imin = output
+        if output > imax:
+            imax = output
+        print(loss)
+        # print(output)
+        mloss += loss / 100
+        # print(imin, imax, mloss)
+
+    # def test_learn(self):
+        
