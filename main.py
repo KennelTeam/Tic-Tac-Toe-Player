@@ -5,6 +5,7 @@ from tqdm import tqdm
 
 from Learning.game import Game
 from NNStructure.supervised_neuro.facade import SupervisedNeuroFacade
+from NNStructure.aws_neuro.facade import AWSNeuroFacade
 from NNStructure.simple_neuro.facade import SimpleNeuroFacade
 from utils.player_role import PlayerRole
 import time
@@ -15,7 +16,7 @@ print(os.getcwd())
 batch_size = 1
 print('Starting reading')
 gamesJson = json.loads(open('data.json').read())
-net = SupervisedNeuroFacade(name='sup7')
+net = AWSNeuroFacade(name='aws')
 print('Starting learning')
 
 for batch_index in tqdm(range(len(gamesJson) // batch_size)):

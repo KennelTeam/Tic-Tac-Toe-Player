@@ -4,16 +4,20 @@ import torch
 from torch import nn
 
 
-class SupervisedNeuroStruct(nn.Module):
+class AWSNeuroStruct(nn.Module):
     def __init__(self):
-        super(SupervisedNeuroStruct, self).__init__()
-        self.fc1 = nn.Linear(225, 1024, device=torch.device(DEVICE_NAME))
+        super(AWSNeuroStruct, self).__init__()
+        self.fc1 = nn.Linear(225 * 3, 1024, device=torch.device(DEVICE_NAME))
         self.fc2 = nn.Linear(1024, 1024, device=torch.device(DEVICE_NAME))
-        self.fc3 = nn.Linear(1024, 1, device=torch.device(DEVICE_NAME))
+        self.fc3 = nn.Linear(1024, 1024, device=torch.device(DEVICE_NAME))
+        self.fc4 = nn.Linear(1024, 1024, device=torch.device(DEVICE_NAME))
+        self.fc5 = nn.Linear(1024, 1, device=torch.device(DEVICE_NAME))
 
         nn.init.uniform_(self.fc1.weight, -1, 1)
         nn.init.uniform_(self.fc2.weight, -1, 1)
         nn.init.uniform_(self.fc3.weight, -1, 1)
+        nn.init.uniform_(self.fc4.weight, -1, 1)
+        nn.init.uniform_(self.fc5.weight, -1, 1)
 
     def forward(self, data: torch.Tensor) -> torch.Tensor:
         sm = nn.Sigmoid()

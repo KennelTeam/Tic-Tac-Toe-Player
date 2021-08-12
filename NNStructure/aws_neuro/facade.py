@@ -9,20 +9,20 @@ from torch import nn
 import pandas as pd
 from Learning.game import Game
 from NNStructure.base_facade import BaseFacade
-from NNStructure.supervised_neuro.struct import SupervisedNeuroStruct
+from NNStructure.aws_neuro.struct import AWSNeuroStruct
 from utils.config import DEVICE_NAME
 from utils.player_role import PlayerRole
 
 
-class SupervisedNeuroFacade(BaseFacade):
+class AWSNeuroFacade(BaseFacade):
     loss_function: nn.BCELoss
     cdir: str
-    net: SupervisedNeuroStruct
+    net: AWSNeuroStruct
     statsTable: pd.DataFrame
 
-    def __init__(self, name: str, load_state=True, lr: float = 0.00001, version: int = -1):
+    def __init__(self, name: str, load_state=True, lr: float = 0.00003, version: int = -1):
         super().__init__(name)
-        self.net = SupervisedNeuroStruct()
+        self.net = AWSNeuroStruct()
 
         self.loss_function = nn.BCELoss()
         self.lr = lr
@@ -95,18 +95,18 @@ class SupervisedNeuroFacade(BaseFacade):
                 # fc = field.copy()
                 if field[0][i * 15 + j] == 0:
                     field[0][i * 15 + j] = 1
-                    # field[0][225 + i * 15 + j] = 1
+                    field[0][225 + i * 15 + j] = 1
                     r = self.net(field).item()
                     if r >= best[1]:
                         best = ((i, j), r)
                     field[0][i * 15 + j] = 0
-                    # field[0][225 + i * 15 + j] = 0
+                    field[0][225 + i * 15 + j] = 0
 
         return best[0]
 
     def prepare_field(self, field: torch.Tensor) -> torch.Tensor:
-        # return torch.cat((field, torch.div((field + 1), 2), torch.div((field - 1), 2)), 1)
-        return field
+        return torch.cat((field, torch.div((field + 1), 2), torch.div((field - 1), 2)), 1)
+        # return field
 
     def learn(self, game_history: Game, myrole: PlayerRole):
         # if myrole != game_history.get_winner():
@@ -121,7 +121,7 @@ class SupervisedNeuroFacade(BaseFacade):
                     # fc = field.copy()
                     if field[0][i * 15 + j] == 0:
                         field[0][i * 15 + j] = 1
-                        # field[0][225 + i * 15 + j] = 1
+                        field[0][225 + i * 15 + j] = 1
                         nloss = 0
                         iscnas = 0
                         if i == inp_ans[0] and j == inp_ans[1]:
@@ -130,7 +130,7 @@ class SupervisedNeuroFacade(BaseFacade):
                             nloss, iscans = self.one_learning_step(field, False)
 
                         field[0][i * 15 + j] = 0
-                        # field[0][225 + i * 15 + j] = 0
+                        field[0][225 + i * 15 + j] = 0
 
                         loss = (loss * iters + nloss) / (iters + 1)
                         corr_anses = (corr_anses * iters + iscnas) / (iters + 1)
