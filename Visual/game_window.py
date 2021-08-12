@@ -105,4 +105,4 @@ class GameWindow:
         for step in game.get_steps():
             self.game.step(step[1])
             self.__tkinter_window.update()
-            time.sleep(0.3)
+            time.sleep(1.5)

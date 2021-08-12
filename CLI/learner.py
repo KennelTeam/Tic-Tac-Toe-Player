@@ -13,6 +13,7 @@ from CLI.cli_commands import *
 import Learning.learning
 import NNLoader
 import sys
+from utils.config import DEVICE_NAME
 
 
 def check_args(args) -> bool:
@@ -28,6 +29,17 @@ def check_args(args) -> bool:
     possible_warnings = {'none', 'warning', 'error'}
     if args.warning_level not in possible_warnings:
         error(f"Wrong warning level: {args.warning_level}. Possible levels: {', '.join(list(possible_warnings))}")
+        return False
+
+    if str(args.core).startswith("cuda"):
+        _, ver = args.core.split('cuda:')
+        try:
+            v = int(ver)
+        except Exception as e:
+            error(f"Wrong core name. Should be cpu or cuda:<id>, but {args.core} is given")
+            return False
+    elif args.core != "cpu":
+        error(f"Wrong core name. Should be cpu or cuda:<id>, but {args.core} is given")
         return False
 
     return True
@@ -66,13 +78,15 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Run learning process")
     parser.add_argument("-e", type=int, help="Number of epochs")
     parser.add_argument("-p", type=int, help="Number of players (NN's)")
-    parser.add_argument("--default", required=False, default="simple_neuro", type=str, help="Name of default NN facade")
+    parser.add_argument("--default", required=False, default="SimpleNeuroFacade", type=str, help="Name of default NN facade")
     parser.add_argument("--names", required=False, default="", type=str,
                         help="Names of NNs (comma separated without spaces)")
     parser.add_argument("--warning_level", required=False, type=str, default="warning",
                         help="Level of warning importance. none, warning or error. Default is warning")
     parser.add_argument("--show_statistics", required=False, action="store_true",
                         help="If set shows statistics after run")
+    parser.add_argument("--core", required=False, default=DEVICE_NAME,
+                        help="Name of device to run computations on", type=str)
     try:
         args = parser.parse_args()
 
@@ -84,6 +98,8 @@ if __name__ == '__main__':
                 dir_names = []
 
             check_args_warning(args, dir_names)
+
+            DEVICE_NAME = args.core
 
             try:
                 learning = Learning.learning.Learning(model_class=default,
