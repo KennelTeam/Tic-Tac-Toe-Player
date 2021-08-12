@@ -9,7 +9,6 @@ from NNStructure.aws_neuro.facade import AWSNeuroFacade
 from NNStructure.simple_neuro.facade import SimpleNeuroFacade
 from utils.player_role import PlayerRole
 import time
-from Visual.game_window import GameWindow
 
 # os.chdir('TicTacToe')
 print(os.getcwd())
@@ -33,7 +32,6 @@ for batch_index in tqdm(range(len(gamesJson) // batch_size)):
     end_upload = time.time()
     for game in structGames:
         net.learn(game, PlayerRole.CROSSES)
-        GameWindow(game)
     end_learning = time.time()
     print(end_upload - begin_upload)
     print(end_learning - end_upload)

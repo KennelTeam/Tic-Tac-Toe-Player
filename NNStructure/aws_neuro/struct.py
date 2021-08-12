@@ -27,4 +27,8 @@ class AWSNeuroStruct(nn.Module):
         data = sm(data)
         data = self.fc3(data)
         data = sm(data)
+        data = self.fc4(data)
+        data = sm(data)
+        data = self.fc5(data)
+        data = sm(data)
         return data
