@@ -1,6 +1,6 @@
 # Tic-Tac-Toe-Player
 
-`This is a neural network that should be able to play tic-tac-toe on big field`
+### This is a neural network that should be able to play tic-tac-toe on big field
 
 ## Installation
 
@@ -45,7 +45,7 @@ But NNs cannot see patterns in game (such as 3 or 4 in a row) and can't really c
 
 ## Problems
 
-- The main problem we faced is the speed of learning - despite we use GPU and we have very little layers' size networks are learning extremly slow so we didn't have ability to our hypothesis
+- The main problem we faced is the speed of learning - despite we use GPU and we have very little layers' size networks are learning extremly slow so we didn't have ability to test our hypothesis
 
 ## Our hypothesis
 
